@@ -30,12 +30,27 @@ SECRET_KEY = os.environ.get('SECRET_KEY') or 'n9ceqv38)#&mwuat@(mjb_p%em$e8$qyr#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env_to_bool('DJANGO_DEBUG', True)
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 # Application definition
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    # 유저 식별
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+AUTH_USER_MODEL = 'account.CustomUser'
+
+AUTHENTICATION_BACKENDS = ['account.auth_backends.EmailBackend']
 
 INSTALLED_APPS = [
+    'account',
+    'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
