@@ -16,5 +16,5 @@ class RoutineRequestForOneSerializer(serializers.Serializer):
     routine_id = serializers.IntegerField(required = True)
     
 class RoutineListReqSerializer(serializers.Serializer):
-    account_id = serializers.IntegerField(Required = True)
-    today = serializers.DateField(Required = True)
+    account_id = serializers.IntegerField(required = True)
+    today = serializers.DateField(required = True)
