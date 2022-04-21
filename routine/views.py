@@ -123,3 +123,27 @@ class RoutineListView(APIView) :
                 }
             })
         return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': serializer.errors})
+
+# routine 삭제
+class RoutineDelView(APIView) :
+    http_method_names = ['delete']
+    
+    def delete(self, *args, **kwargs) :
+        serializer = RoutineListReqSerializer(data=self.request.data)
+        if serializer.is_valid():
+            jwt_token = self.request.headers.get('Authorization')
+            access_token_obj = AccessToken(jwt_token)
+            user_id = access_token_obj['user_id']
+            account_id = serializer.data['account_id']
+            if user_id == account_id :
+                routine = Routine.objects.get(routine_id = serializer.data['routine_id'])
+                Routine.objects.filter(routine_id=routine).delete()
+                return Response(status=status.HTTP_201_CREATED, data = {
+                    'data' : {
+                        'routine_id' : routine.routine_id
+                    },
+                    'message' : {
+                        'msg' : ' .', 'status' : 'ROUTINE_DELETE_OK'
+                    }
+                })
+                
