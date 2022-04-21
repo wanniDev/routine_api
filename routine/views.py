@@ -1,3 +1,4 @@
+import re
 from unicodedata import category
 from django.shortcuts import render
 from rest_framework.response import Response
@@ -12,7 +13,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 # routine 추가
 class CreateRoutineView(APIView) :
-    http_method_names = ['post']
+    http_method_names = ['post', 'put']
     
     permission_classes = (permissions.AllowAny,)
     
@@ -29,9 +30,29 @@ class CreateRoutineView(APIView) :
                                    category=serializer.data['category'],
                                    is_alarm=serializer.data['is_alarm']
                                    )
-            RoutineResult.objects.create(routine_id=routine,
-                                         result='NOT'
-                                         )
+            return Response(status=status.HTTP_201_CREATED, data = {
+                'data' : {
+                    'routine_id' : routine.routine_id
+                },
+                'message' : {
+                    'msg' : ' .', 'status' : 'ROUTINE_CREATE_OK'
+                }
+            })
+        return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': serializer.errors})
+    
+    def put(self, *args, **kwargs) :
+        serializer = RoutineRequestSerializer(data = self.request.data)
+        
+        if serializer.is_valid():
+            jwt_token = self.request.headers.get('Authorization')
+            access_token_obj = AccessToken(jwt_token)
+            user_id = access_token_obj['user_id']
+            user = CustomUser.objects.get(id = user_id)
+            routine = Routine.objects.update(account_id=user,
+                                   title=serializer.data['title'],
+                                   category=serializer.data['category'],
+                                   is_alarm=serializer.data['is_alarm']
+                                   )
             return Response(status=status.HTTP_201_CREATED, data = {
                 'data' : {
                     'routine_id' : routine.routine_id
@@ -87,10 +108,18 @@ class RoutineListView(APIView) :
             if user is not None and user.id == user_id :
                 routines = Routine.objects.filter(account_id = user, create_at = serializer.data['today'])
                 for routine in routines :
+                    routine_result : RoutineResult.objects.get(routine_id=routine)
                     results.append(
                         {
                             'id' : routine.routine_id,
-                            "title" : routine.title
+                            'title' : routine.title,
+                            'result' : routine_result                          
                         }
                     )
-                
+                return Response(status=status.HTTP_200_OK, data = {
+                'data' : results,
+                'message' : {
+                    'msg' : ' .', 'status' : 'ROUTINE_LIST_OK'
+                }
+            })
+        return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': serializer.errors})
