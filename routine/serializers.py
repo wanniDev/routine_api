@@ -1,3 +1,4 @@
+from re import T
 from turtle import title
 from typing_extensions import Required
 from rest_framework import serializers
@@ -13,10 +14,10 @@ class RoutineRequestSerializer(serializers.Serializer):
 class RoutineIdSerializer(serializers.Serializer):
     routine_id = serializers.IntegerField()
 
-class MessageSerializer(serializers.Serializer):
-    msg = serializers.CharField(max_length=200)
-    status = serializers.CharField(max_length=50)
-
-class RoutineResponseSerializer(serializers.Serializer):
-    data = RoutineIdSerializer()
-    message = MessageSerializer()
+class RoutineRequestForOneSerializer(serializers.Serializer):
+    account_id = serializers.IntegerField(required = True)
+    routine_id = serializers.IntegerField(required = True)
+    
+class RoutineListReqSerializer(serializers.Serializer):
+    account_id = serializers.IntegerField(Required = True)
+    today = serializers.DateField(Required = True)
