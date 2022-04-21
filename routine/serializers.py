@@ -1,6 +1,3 @@
-from re import T
-from turtle import title
-from typing_extensions import Required
 from rest_framework import serializers
 from .models import CATEGORY_CHOICES, RESULT_CHOICES, Routine, RoutineDay
 
